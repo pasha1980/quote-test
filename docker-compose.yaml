@@ -1,0 +1,34 @@
+version: '3.9'
+
+services:
+  app:
+    container_name: quote-app
+    build:
+      dockerfile: Dockerfile
+      context: .
+    env_file:
+      - .env
+    ports:
+      - "8080:80"
+    depends_on:
+      - elasticsearch
+    networks:
+      - quote-net
+
+  elasticsearch:
+    image: elasticsearch:8.11.1
+    container_name: elastic
+    restart: always
+    ports:
+      - 9200:9200
+    volumes:
+      - ./data/elasticsearch:/usr/share/elasticsearch/data
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    networks:
+      - quote-net
+
+networks:
+  quote-net:
+    driver: bridge
